@@ -7,7 +7,7 @@
 Summary:	Multi purpose wrapper plugin for Nagios/Icinga
 Name:		nagios-plugin-%{plugin}
 Version:	0.26
-Release:	0.9
+Release:	0.11
 License:	GPL v2
 Group:		Networking
 URL:		http://my-plugin.de/wiki/projects/check_multi/start
@@ -15,10 +15,12 @@ Source0:	http://my-plugin.de/check_multi/%{plugin}-stable-%{version}.tar.gz
 # Source0-md5:	38f822c3911c0cd5e625e859237ff902
 BuildRequires:	perl-base
 BuildRequires:	rpm-perlprov >= 4.1-13
+BuildRequires:	sed >= 4.0
 BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_sysconfdir		/etc/nagios/plugins
+%define		_localstatedir	/var/lib/nagios
 %define		plugindir		%{_prefix}/lib/nagios/plugins
 
 %description
@@ -52,9 +54,6 @@ MAILX=/bin/mailx \
 	--libexecdir=%{plugindir} \
 	--with-plugin_path=%{plugindir} \
 	--with-checkresults_dir=/var/spool/nagios/checkresults \
-	--with-livestatus=/var/lib/nagios/rw/live \
-	--with-objects_cache=/var/lib/nagios/objects.cache \
-	--with-status_dat=/var/lib/nagios/status.dat \
 	%{nil}
 
 %if %{with tests}
