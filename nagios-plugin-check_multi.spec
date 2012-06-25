@@ -7,15 +7,17 @@
 Summary:	Multi purpose wrapper plugin for Nagios/Icinga
 Name:		nagios-plugin-%{plugin}
 Version:	0.26
-Release:	0.11
+Release:	0.14
 License:	GPL v2
 Group:		Networking
 URL:		http://my-plugin.de/wiki/projects/check_multi/start
 Source0:	http://my-plugin.de/check_multi/%{plugin}-stable-%{version}.tar.gz
 # Source0-md5:	38f822c3911c0cd5e625e859237ff902
+Source1:	%{plugin}.cfg
 BuildRequires:	perl-base
 BuildRequires:	rpm-perlprov >= 4.1-13
 BuildRequires:	sed >= 4.0
+Requires:	perl(Getopt::Long) >= 2.27
 BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -54,6 +56,9 @@ MAILX=/bin/mailx \
 	--libexecdir=%{plugindir} \
 	--with-plugin_path=%{plugindir} \
 	--with-checkresults_dir=/var/spool/nagios/checkresults \
+	--with-tmp_dir=/var/spool/nagios/%{plugin} \
+	--with-tmp_etc=/var/spool/nagios/%{plugin}/etc \
+	--with-tmp_dir_permissions=0770 \
 	%{nil}
 
 %if %{with tests}
@@ -62,6 +67,7 @@ MAILX=/bin/mailx \
 
 %install
 rm -rf $RPM_BUILD_ROOT
+install -d $RPM_BUILD_ROOT/var/spool/nagios/%{plugin}/etc
 %{__make} install \
 	-C plugins \
 	DESTDIR=$RPM_BUILD_ROOT
@@ -71,14 +77,20 @@ install -d $RPM_BUILD_ROOT%{_sysconfdir}/%{plugin}/{cluster,feed_passive}
 	CFGDIR=%{_examplesdir}/%{name}-%{version} \
 	DESTDIR=$RPM_BUILD_ROOT
 
+cp -p %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/%{plugin}.cfg
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
 %doc Changelog CM_VERSION LICENSE THANKS README
+%attr(640,root,nagios) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/%{plugin}.cfg
 %dir %{_sysconfdir}/%{plugin}
 %attr(755,root,root) %{plugindir}/check_multi
+
+%dir %attr(770,root,nagios) /var/spool/nagios/%{plugin}
+%dir %attr(770,root,nagios) /var/spool/nagios/%{plugin}/etc
 
 %dir %{_examplesdir}/%{name}-%{version}
 %{_examplesdir}/%{name}-%{version}/*.cmd
