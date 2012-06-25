@@ -7,7 +7,7 @@
 Summary:	Multi purpose wrapper plugin for Nagios/Icinga
 Name:		nagios-plugin-%{plugin}
 Version:	0.26
-Release:	0.2
+Release:	0.9
 License:	GPL v2
 Group:		Networking
 URL:		http://my-plugin.de/wiki/projects/check_multi/start
@@ -18,8 +18,8 @@ BuildRequires:	rpm-perlprov >= 4.1-13
 BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-%define		_sysconfdir	/etc/nagios/plugins
-%define		plugindir	%{_prefix}/lib/nagios/plugins
+%define		_sysconfdir		/etc/nagios/plugins
+%define		plugindir		%{_prefix}/lib/nagios/plugins
 
 %description
 check_multi is a multi purpose wrapper plugin which takes benefit of
@@ -40,13 +40,22 @@ check_multi.
 %prep
 %setup -q -n %{plugin}-%{version}
 
+%{__sed} -i -e '
+	s,@sysconfdir@/send_nsca.cfg,/etc/nagios/send_nsca.cfg,
+' plugins/check_multi.in
+
 %build
 ETHTOOL=/sbin/ethtool \
 GUNZIP=/usr/bin/gunzip \
 MAILX=/bin/mailx \
 %configure \
-	--prefix=%{plugindir} \
-	--libexecdir=%{plugindir}
+	--libexecdir=%{plugindir} \
+	--with-plugin_path=%{plugindir} \
+	--with-checkresults_dir=/var/spool/nagios/checkresults \
+	--with-livestatus=/var/lib/nagios/rw/live \
+	--with-objects_cache=/var/lib/nagios/objects.cache \
+	--with-status_dat=/var/lib/nagios/status.dat \
+	%{nil}
 
 %if %{with tests}
 %{__make} test
@@ -58,7 +67,7 @@ rm -rf $RPM_BUILD_ROOT
 	-C plugins \
 	DESTDIR=$RPM_BUILD_ROOT
 
-install -d $RPM_BUILD_ROOT%{_sysconfdir}/%{plugin}
+install -d $RPM_BUILD_ROOT%{_sysconfdir}/%{plugin}/{cluster,feed_passive}
 %{__make} install-config \
 	CFGDIR=%{_examplesdir}/%{name}-%{version} \
 	DESTDIR=$RPM_BUILD_ROOT
