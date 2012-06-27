@@ -7,7 +7,7 @@
 Summary:	Multi purpose wrapper plugin for Nagios/Icinga
 Name:		nagios-plugin-%{plugin}
 Version:	0.26
-Release:	0.19
+Release:	0.22
 License:	GPL v2
 Group:		Networking
 URL:		http://my-plugin.de/wiki/projects/check_multi/start
@@ -16,6 +16,7 @@ Source0:	http://my-plugin.de/check_multi/%{plugin}-stable-%{version}.tar.gz
 Source1:	%{plugin}.cfg
 Patch0:		issue-6.patch
 Patch1:		nstats.patch
+Patch2:		nagios2-mode.patch
 BuildRequires:	perl-base
 BuildRequires:	rpm-perlprov >= 4.1-13
 BuildRequires:	sed >= 4.0
@@ -47,6 +48,7 @@ check_multi.
 %setup -q -n %{plugin}-%{version}
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 
 %{__sed} -i -e '
 	s,@sysconfdir@/send_nsca.cfg,/etc/nagios/send_nsca.cfg,
@@ -80,7 +82,7 @@ install -d $RPM_BUILD_ROOT%{_sysconfdir}/%{plugin}/{cluster,feed_passive}
 
 # package contrib and sample config as examples
 %{__make} install-config \
-	CFGDIR=%{_examplesdir}/%{name}-%{version}/config \
+	CFGDIR=%{_examplesdir}/%{name}-%{version}/sample_config \
 	DESTDIR=$RPM_BUILD_ROOT
 
 %{__make} install-contrib \
@@ -91,7 +93,7 @@ install -d $RPM_BUILD_ROOT%{_sysconfdir}/%{plugin}/{cluster,feed_passive}
 
 cp -p %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/%{plugin}.cfg
 
-cd $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}/config
+cd $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}/sample_config
 # this one seems useful, package as config
 cp -p nagiostats.cmd $RPM_BUILD_ROOT%{_sysconfdir}/%{plugin}
 
@@ -111,15 +113,15 @@ rm -rf $RPM_BUILD_ROOT
 
 %{_examplesdir}/%{name}-%{version}/contrib
 
-%dir %{_examplesdir}/%{name}-%{version}/config
-%{_examplesdir}/%{name}-%{version}/config/*.cmd
+%dir %{_examplesdir}/%{name}-%{version}/sample_config
+%{_examplesdir}/%{name}-%{version}/sample_config/*.cmd
 
-%dir %{_examplesdir}/%{name}-%{version}/config/cluster
-%{_examplesdir}/%{name}-%{version}/config/cluster/*.cfg
-%{_examplesdir}/%{name}-%{version}/config/cluster/*.cmd
+%dir %{_examplesdir}/%{name}-%{version}/sample_config/cluster
+%{_examplesdir}/%{name}-%{version}/sample_config/cluster/*.cfg
+%{_examplesdir}/%{name}-%{version}/sample_config/cluster/*.cmd
 
-%dir %{_examplesdir}/%{name}-%{version}/config/feed_passive
-%{_examplesdir}/%{name}-%{version}/config/feed_passive/*.cfg
-%{_examplesdir}/%{name}-%{version}/config/feed_passive/*.cmd
-%{_examplesdir}/%{name}-%{version}/config/feed_passive/*.tpl
-%attr(755,root,root) %{_examplesdir}/%{name}-%{version}/config/feed_passive/gencfg
+%dir %{_examplesdir}/%{name}-%{version}/sample_config/feed_passive
+%{_examplesdir}/%{name}-%{version}/sample_config/feed_passive/*.cfg
+%{_examplesdir}/%{name}-%{version}/sample_config/feed_passive/*.cmd
+%{_examplesdir}/%{name}-%{version}/sample_config/feed_passive/*.tpl
+%attr(755,root,root) %{_examplesdir}/%{name}-%{version}/sample_config/feed_passive/gencfg
