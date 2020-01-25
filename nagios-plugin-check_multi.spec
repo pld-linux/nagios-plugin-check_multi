@@ -3,7 +3,6 @@
 %bcond_without	tests		# build without tests
 
 %define		plugin	check_multi
-%include	/usr/lib/rpm/macros.perl
 Summary:	Multi purpose wrapper plugin for Nagios/Icinga
 Name:		nagios-plugin-%{plugin}
 Version:	0.26
