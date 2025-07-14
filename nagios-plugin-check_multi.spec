@@ -45,9 +45,9 @@ check_multi.
 
 %prep
 %setup -q -n %{plugin}-%{version}
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
+%patch -P0 -p1
+%patch -P1 -p1
+%patch -P2 -p1
 
 %{__sed} -i -e '
 	s,@sysconfdir@/send_nsca.cfg,/etc/nagios/send_nsca.cfg,
